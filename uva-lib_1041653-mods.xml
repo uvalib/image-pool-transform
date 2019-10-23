@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-6.xsd"
+      version="3.6">
+   <titleInfo>
+      <title>B. Beacham</title>
+   </titleInfo>
+   <name type="personal" authority="naf">
+      <namePart type="given">Rufus W.</namePart>
+      <namePart type="family">Holsinger</namePart>
+      <namePart type="date">1866-1930</namePart>
+      <role>
+         <roleTerm type="code" authority="marcrelator">pht</roleTerm>
+      </role>
+   </name>
+   <genre authority="lctgm">Glass negatives</genre>
+   <typeOfResource>still image</typeOfResource>
+   <originInfo>
+      <dateCreated keyDate="yes" encoding="edtf">1914-01-13</dateCreated>
+      <place>
+         <placeTerm type="text">Charlottesville, Va.</placeTerm>
+      </place>
+   </originInfo>
+   <physicalDescription>
+      <form authority="marccategory">nonprojected graphic</form>
+      <internetMediaType>image/jpeg</internetMediaType>
+      <digitalOrigin>reformatted digital</digitalOrigin>
+      <extent>8 x 10 in.</extent>
+      <note displayLabel="condition">Plate is in good condition.</note>
+   </physicalDescription>
+   <subject authority="lcsh">
+      <topic>Portraits</topic>
+   </subject>
+   <subject authority="lcsh">
+      <name type="corporate" authority="naf">
+         <namePart>Holsinger Studio (Charlottesville, Va.)</namePart>
+      </name>
+   </subject>
+   <relatedItem type="series" displayLabel="Part of">
+      <titleInfo>
+         <nonSort>The</nonSort>
+         <title>Holsinger Studio Collection</title>
+      </titleInfo>
+      <name type="personal" authority="naf">
+         <namePart type="given">Rufus W.</namePart>
+         <namePart type="family">Holsinger</namePart>
+         <namePart type="date">1866-1930</namePart>
+      </name>
+      <originInfo>
+         <dateCreated point="start" encoding="edtf">1889</dateCreated>
+         <dateCreated point="end" encoding="edtf">1939</dateCreated>
+      </originInfo>
+   </relatedItem>
+   <identifier type="legacy" displayLabel="Negative Number">X02029B</identifier>
+   <identifier type="metadata pid">uva-lib:1041653</identifier>
+   <identifier type="master file pid">uva-lib:1041653</identifier>
+   <identifier type="legacy" displayLabel="Special Collections legacy database record number"
+               invalid="yes">39734</identifier>
+   <identifier type="uri" displayLabel="Accessible index record displayed in VIRGO">uva-lib:1041653</identifier>
+   <identifier type="local" displayLabel="Digitization Services Tracksys Unit ID">7702</identifier>
+   <identifier type="local" displayLabel="Digitization Services Tracksys MasterFile ID">367911</identifier>
+   <identifier type="local" displayLabel="Digitization Services Archive Filename">000007702_0009.tif</identifier>
+   <identifier type="accessionNumber" displayLabel="Collection Accession Number">MSS 9862</identifier>
+   <location>
+      <physicalLocation>Special Collections, University of Virginia Library, Charlottesville, Va.</physicalLocation>
+      <physicalLocation authority="oclcorg">VA@</physicalLocation>
+   </location>
+   <recordInfo>
+      <recordContentSource>University of Virginia Library</recordContentSource>
+      <recordCreationDate encoding="iso8601">2007-08-23T11:24:33</recordCreationDate>
+      <recordChangeDate encoding="iso8601">2009-07-23T10:35:57.04-04:00</recordChangeDate>
+      <recordOrigin>University of Virginia Library</recordOrigin>
+      <languageOfCataloging>
+         <languageTerm type="code" authority="iso639-2b">eng</languageTerm>
+      </languageOfCataloging>
+   </recordInfo>
+</mods>
