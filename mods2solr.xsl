@@ -11,7 +11,9 @@
   <!-- ======================================================================= -->
 
   <xsl:param name="diagnostics" select="'false'"/>
-
+  
+  <xsl:param name="id" required="yes" />
+  
   <!-- ======================================================================= -->
   <!-- GLOBAL VARIABLES                                                        -->
   <!-- ======================================================================= -->
@@ -51,36 +53,41 @@
 
   <xsl:template match="*:mods">
     <doc>
+      <field name="id"><xsl:value-of select="$id" />-group</field>  
+      <xsl:apply-templates mode="group" />
       <field name="originalMetadataType">MODS</field>
-      <xsl:apply-templates/>
+      <doc>
+        <field name="id"><xsl:value-of select="$id" /></field> 
+        <xsl:apply-templates mode="item" />
+      </doc>
     </doc>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:abstract">
-    <field name="summary">
+  <xsl:template match="*:mods/*:abstract" mode="item">
+    <field name="summary_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:accessCondition[@type = 'restrictionOnAccess']">
-    <field name="accessRestrict">
+  <xsl:template match="*:mods/*:accessCondition[@type = 'restrictionOnAccess']" mode="item">
+    <field name="accessRestrict_tsearch">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:genre">
-    <field name="workType">
+  <xsl:template match="*:mods/*:genre" mode="item">
+    <field name="workType_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:identifier">
-    <field name="otherIdentifier">
+  <xsl:template match="*:mods/*:identifier" mode="item">
+    <field name="otherIdentifier_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:location">
+  <xsl:template match="*:mods/*:location" mode="item">
     <!--<field name="originals">
       <xsl:value-of select="normalize-space(string-join(*:physicalLocation, ', '))"/>
       <!-\-<xsl:if test="ancestor::*:mods/*:relatedItem[@type = 'series']">
@@ -101,8 +108,8 @@
       </xsl:for-each>
     </field>--> </xsl:template>
 
-  <xsl:template match="*:mods/*:note">
-    <field name="note">
+  <xsl:template match="*:mods/*:note" mode="item">
+    <field name="note_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
@@ -114,7 +121,7 @@
     </field>
   </xsl:template>-->
 
-  <xsl:template match="*:mods/*:originInfo">
+  <xsl:template match="*:mods/*:originInfo" mode="item">
     <xsl:choose>
       <xsl:when test="*:dateCreated">
         <field name="creationDate">
@@ -129,19 +136,19 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:physicalDescription/*:digitalOrigin">
+  <xsl:template match="*:mods/*:physicalDescription/*:digitalOrigin" mode="item">
     <field name="digitalOrigin">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:physicalDescription/*:internetMediaType">
+  <xsl:template match="*:mods/*:physicalDescription/*:internetMediaType" mode="item">
     <field name="internetMediaType">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:relatedItem[@type = 'host']">
+  <xsl:template match="*:mods/*:relatedItem[@type = 'host']" mode="item">
     <field name="resourceGroupName">
       <xsl:value-of
         select="normalize-space(concat(*:titleInfo/*:nonSort, ' ', *:titleInfo/*:title))"/>
@@ -153,7 +160,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:relatedItem[@type = 'original']">
+  <xsl:template match="*:mods/*:relatedItem[@type = 'original']" mode="item">
     <xsl:for-each select="*:typeOfResource">
       <field name="workType">
         <xsl:value-of select="normalize-space(.)"/>
@@ -193,8 +200,8 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:subject">
-    <field name="subject">
+  <xsl:template match="*:mods/*:subject" mode="item">
+    <field name="subject_tsearchf_stored">
       <xsl:for-each select="*">
         <xsl:choose>
           <xsl:when test="matches(local-name(), 'hierarchicalGeographic')">
@@ -216,13 +223,13 @@
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:titleInfo">
-    <field name="title">
+  <xsl:template match="*:mods/*:titleInfo" mode="item">
+    <field name="title_tsearch_stored">
       <xsl:value-of select="normalize-space(concat(*:nonSort, ' ', *:title))"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:typeOfResource">
+  <xsl:template match="*:mods/*:typeOfResource" mode="item">
     <field name="contentType">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
@@ -233,6 +240,10 @@
   <!-- ======================================================================= -->
 
   <xsl:template match="@* | node()">
+    <xsl:apply-templates select="@* | node()"/>
+  </xsl:template>
+  
+  <xsl:template match="@* | node()" mode="group item">
     <xsl:apply-templates select="@* | node()"/>
   </xsl:template>
 
