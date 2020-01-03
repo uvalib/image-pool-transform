@@ -3,7 +3,7 @@
   xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="mods xlink">
 
-  <xsl:output media-type="text/xml" method="xml" indent="yes"/>
+  <xsl:output method="xml" indent="yes" omit-xml-declaration="yes" />
   <xsl:strip-space elements="*"/>
 
   <!-- ======================================================================= -->
@@ -42,9 +42,7 @@
   <!-- ======================================================================= -->
 
   <xsl:template match="/">
-    <add>
-      <xsl:apply-templates select="//*:mods"/>
-    </add>
+    <xsl:apply-templates select="//*:mods"/>
   </xsl:template>
 
   <!-- ======================================================================= -->
@@ -55,13 +53,27 @@
     <doc>
         <!-- It's not clear if/how the group will show up in the solr search so the ID may need to be more real.. currently V4 doesn't expose IDs for groups (if they even exist) -->
       <field name="id"><xsl:value-of select="$id" />-group</field>  
-      <xsl:apply-templates mode="group" />
+      <xsl:apply-templates mode="item" />
+      <field name="pool_f_stored">images</field>
+      <field name="doc_type_tsearch_stored">image_group</field>
+      <field name="text_tsearch_stored">unique0</field>
       <!--<field name="originalMetadataType">MODS</field>-->
-      <doc>
-        <field name="id"><xsl:value-of select="$id" /></field>
-        <field name="url_iiif_stored">https://iiif.lib.virginia.edu/iiif/<xsl:value-of select="$id"/>/info.json</field> 
-        <xsl:apply-templates mode="item" />
-      </doc>
+      <field name="items">
+          <doc>
+            <field name="id"><xsl:value-of select="$id" />-1</field>
+            <field name="url_iiif_stored">https://iiif.lib.virginia.edu/iiif/<xsl:value-of select="$id"/>/info.json</field> 
+            <field name="doc_type_tsearch_stored">image_item</field>
+            <field name="text_tsearch_stored">unique1</field>
+            <xsl:apply-templates mode="item" />
+          </doc>
+          <doc>
+            <field name="id"><xsl:value-of select="$id" />-2</field>
+            <field name="url_iiif_stored">https://iiif.lib.virginia.edu/iiif/<xsl:value-of select="$id"/>/info.json</field> 
+            <field name="doc_type_tsearch_stored">image_item</field>
+            <field name="text_tsearch_stored">unique2</field>
+            <xsl:apply-templates mode="item" />
+          </doc>
+      </field>
     </doc>
   </xsl:template>
 
