@@ -53,55 +53,47 @@
     <doc>
         <!-- It's not clear if/how the group will show up in the solr search so the ID may need to be more real.. currently V4 doesn't expose IDs for groups (if they even exist) -->
       <field name="id"><xsl:value-of select="$id" />-group</field>  
-      <xsl:apply-templates mode="item" />
+      <xsl:apply-templates mode="group" />
       <field name="pool_f_stored">images</field>
       <field name="doc_type_tsearch_stored">image_group</field>
-      <field name="text_tsearch_stored">unique0</field>
       <!--<field name="originalMetadataType">MODS</field>-->
       <field name="items">
           <doc>
-            <field name="id"><xsl:value-of select="$id" />-1</field>
-            <field name="url_iiif_stored">https://iiif.lib.virginia.edu/iiif/<xsl:value-of select="$id"/>/info.json</field> 
+            <field name="id"><xsl:value-of select="$id" /></field>
+            <field name="url_iiif_manifest_stored">https://iiifman.lib.virginia.edu/pid/<xsl:value-of select="$id"/></field> 
+            <field name="url_iiif_image_stored">https://iiif.lib.virginia.edu/iiif/<xsl:value-of select="$id"/>/info.json</field>
             <field name="doc_type_tsearch_stored">image_item</field>
-            <field name="text_tsearch_stored">unique1</field>
-            <xsl:apply-templates mode="item" />
-          </doc>
-          <doc>
-            <field name="id"><xsl:value-of select="$id" />-2</field>
-            <field name="url_iiif_stored">https://iiif.lib.virginia.edu/iiif/<xsl:value-of select="$id"/>/info.json</field> 
-            <field name="doc_type_tsearch_stored">image_item</field>
-            <field name="text_tsearch_stored">unique2</field>
             <xsl:apply-templates mode="item" />
           </doc>
       </field>
     </doc>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:abstract" mode="group">
+  <xsl:template match="*:mods/*:abstract" mode="item">
     <field name="summary_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:accessCondition[@type = 'restrictionOnAccess']" mode="skip">
+  <xsl:template match="*:mods/*:accessCondition[@type = 'restrictionOnAccess']" mode="item">
     <field name="accessRestrict_tsearch">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:genre" mode="skip">
+  <xsl:template match="*:mods/*:genre" mode="item">
     <field name="workType_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:identifier" mode="group">
+  <xsl:template match="*:mods/*:identifier" mode="item">
     <field name="otherIdentifier_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:location" mode="group">
+  <xsl:template match="*:mods/*:location" mode="item">
     <!--<field name="originals">
       <xsl:value-of select="normalize-space(string-join(*:physicalLocation, ', '))"/>
       <!-\-<xsl:if test="ancestor::*:mods/*:relatedItem[@type = 'series']">
@@ -122,7 +114,7 @@
       </xsl:for-each>
     </field>--> </xsl:template>
 
-  <xsl:template match="*:mods/*:note" mode="group">
+  <xsl:template match="*:mods/*:note" mode="item">
     <field name="note_tsearch_stored">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
@@ -135,7 +127,7 @@
     </field>
   </xsl:template>-->
 
-  <xsl:template match="*:mods/*:originInfo" mode="group">
+  <xsl:template match="*:mods/*:originInfo" mode="item">
     <xsl:choose>
       <xsl:when test="*:dateCreated">
         <field name="published_daterange">
@@ -150,19 +142,19 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:physicalDescription/*:digitalOrigin" mode="skip">
+  <xsl:template match="*:mods/*:physicalDescription/*:digitalOrigin" mode="item">
     <field name="digitalOrigin">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:physicalDescription/*:internetMediaType" mode="skip">
+  <xsl:template match="*:mods/*:physicalDescription/*:internetMediaType" mode="item">
     <field name="internetMediaType">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:relatedItem[@type = 'host']" mode="group">
+  <xsl:template match="*:mods/*:relatedItem[@type = 'host']" mode="item">
     <field name="collection_f_stored">
       <xsl:value-of
         select="normalize-space(concat(*:titleInfo/*:nonSort, ' ', *:titleInfo/*:title))"/>
@@ -174,7 +166,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:relatedItem[@type = 'original']" mode="group">
+  <xsl:template match="*:mods/*:relatedItem[@type = 'original']" mode="item">
     <xsl:for-each select="*:typeOfResource">
       <field name="workType_tsearch_stored">
         <xsl:value-of select="normalize-space(.)"/>
@@ -214,7 +206,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:subject" mode="group">
+  <xsl:template match="*:mods/*:subject" mode="item">
     <field name="subject_tsearchf_stored">
       <xsl:for-each select="*">
         <xsl:choose>
@@ -237,7 +229,7 @@
     </field>
   </xsl:template>
 
-  <xsl:template match="*:mods/*:titleInfo" mode="group">
+  <xsl:template match="*:mods/*:titleInfo" mode="item">
     <field name="title_tsearch_stored">
       <xsl:value-of select="normalize-space(concat(*:nonSort, ' ', *:title))"/>
     </field>
