@@ -55,14 +55,14 @@
       <field name="id"><xsl:value-of select="$id" />-group</field>  
       <xsl:apply-templates mode="group" />
       <field name="pool_f_stored">images</field>
-      <field name="doc_type_tsearch_stored">image_group</field>
+      <field name="doc_type_f_stored">image_group</field>
       <!--<field name="originalMetadataType">MODS</field>-->
       <field name="items">
           <doc>
             <field name="id"><xsl:value-of select="$id" /></field>
             <field name="url_iiif_manifest_stored">https://iiifman.lib.virginia.edu/pid/<xsl:value-of select="$id"/></field> 
             <field name="url_iiif_image_stored">https://iiif.lib.virginia.edu/iiif/<xsl:value-of select="$id"/>/info.json</field>
-            <field name="doc_type_tsearch_stored">image_item</field>
+            <field name="doc_type_f_stored">image_item</field>
             <xsl:apply-templates mode="item" />
           </doc>
       </field>
@@ -130,14 +130,26 @@
   <xsl:template match="*:mods/*:originInfo" mode="item">
     <xsl:choose>
       <xsl:when test="*:dateCreated">
-        <field name="published_daterange">
+        <xsl:variable name="extractedDate">
           <xsl:for-each select="*:dateCreated">
             <xsl:if test="position() != 1">
               <xsl:text>-</xsl:text>
             </xsl:if>
             <xsl:value-of select="normalize-space(.)"/>
           </xsl:for-each>
-        </field>
+        </xsl:variable>
+        <xsl:call-template name="fixDate">
+          <xsl:with-param name="field">published_daterange</xsl:with-param>
+          <xsl:with-param name="datestring"><xsl:value-of select="$extractedDate" /></xsl:with-param>
+          <xsl:with-param name="range">true</xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="fixDate">
+          <xsl:with-param name="field">published_date</xsl:with-param>
+          <xsl:with-param name="datestring"><xsl:value-of select="$extractedDate"  /></xsl:with-param>
+          <xsl:with-param name="monthDefault">-01</xsl:with-param>
+          <xsl:with-param name="dayDefault">-01</xsl:with-param>
+          <xsl:with-param name="timeDefault">T00:00:00Z</xsl:with-param>
+        </xsl:call-template>       
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -239,6 +251,79 @@
     <field name="contentType">
       <xsl:value-of select="normalize-space(.)"/>
     </field>
+  </xsl:template>
+  
+  <!-- handles fixing all of the dates. Can create a date or a daterange -->
+  <xsl:template name="fixDate">
+    <xsl:param name="field"/>
+    <xsl:param name="datestring"/>
+    <xsl:param name="monthDefault" />
+    <xsl:param name="dayDefault" />
+    <xsl:param name="timeDefault"/>
+    <xsl:param name="range"/>
+    <xsl:variable name="fmtdate">
+      <xsl:choose>
+        <xsl:when test="matches($datestring, '([0-9][0-9][0-9][0-9])[~?]?[/]([0-9][0-9][0-9][0-9])[~?]?(.*)')">
+          <xsl:analyze-string select="$datestring" regex="([0-9][0-9][0-9][0-9])[~?]?[/]([0-9][0-9][0-9][0-9])[~?]?(.*)">
+            <xsl:matching-substring>
+              <xsl:variable name="year1" select="number(regex-group(1))"/>
+              <xsl:variable name="year2" select="number(regex-group(2))"/>
+              <xsl:choose>
+                <xsl:when test="$range = 'true'">
+                  <xsl:value-of select="concat('[',$year1, ' TO ', $year2, ']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat($year1,  $monthDefault, $dayDefault, $timeDefault)"/>                            
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:matching-substring>
+          </xsl:analyze-string>
+        </xsl:when>
+        <xsl:when test="matches($datestring, '([0-9][0-9][0-9][0-9])[-/]([0-9][0-9]?)[-/]([0-9][0-9]?)(.*)')">
+          <xsl:analyze-string select="$datestring" regex="([0-9][0-9][0-9][0-9])[-/]([0-9][0-9]?)[-/]([0-9][0-9]?)(.*)">
+            <xsl:matching-substring>
+              <xsl:variable name="month" select="number(regex-group(2))"/>
+              <xsl:variable name="day" select="number(regex-group(3))"/>
+              <xsl:variable name="year" select="number(regex-group(1))"/>
+              <xsl:value-of select="concat($year, '-', format-number($month, '00'), '-', format-number($day, '00'), $timeDefault)" />
+            </xsl:matching-substring>
+          </xsl:analyze-string>
+        </xsl:when>
+        <xsl:when test="matches($datestring, '[^0-9]*([0-9][0-9][0-9][0-9])(.*)')">
+          <xsl:analyze-string select="$datestring" regex="[^0-9]*([0-9][0-9][0-9][0-9])(.*)">
+            <xsl:matching-substring>
+              <xsl:variable name="year" select="number(regex-group(1))"/>
+              <xsl:value-of select="concat($year, $monthDefault, $dayDefault, $timeDefault)" />
+            </xsl:matching-substring>
+          </xsl:analyze-string>
+        </xsl:when>
+        <xsl:when test="matches($datestring, '[^0-9]*([0-9][0-9][0-9])X(.*)')">
+          <xsl:analyze-string select="$datestring" regex="[^0-9]*([0-9][0-9][0-9])X(.*)">
+            <xsl:matching-substring>
+              <xsl:variable name="yearstart" select="number(regex-group(1))"/>
+              <xsl:variable name="yearunits" select="number(regex-group(1))"/>
+              <xsl:choose>
+                <xsl:when test="$range = 'true'">
+                  <xsl:value-of select="concat('[',$yearstart, '0', ' TO ', $yearstart, '9', ']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat($yearstart,'5', $monthDefault, $dayDefault, $timeDefault)"/>                            
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:matching-substring>
+          </xsl:analyze-string>
+        </xsl:when>
+        <xsl:otherwise>
+          <!--   <xsl:value-of select="concat('%%%%%', $datestring, '%%%%%')"/> -->
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="$fmtdate != ''">
+      <xsl:element name="field">
+        <xsl:attribute name="name"><xsl:value-of select="$field"/></xsl:attribute>
+        <xsl:value-of select="$fmtdate" />
+      </xsl:element>
+    </xsl:if>
   </xsl:template>
 
   <!-- ======================================================================= -->
